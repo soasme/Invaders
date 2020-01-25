@@ -1,0 +1,20 @@
+go.property("velocity", vmath.vector3(0, 1, 0))
+
+go.property("sender", ".")
+
+function die(self)
+	print(go.get_id(), "(bullet)", "die")
+	go.delete()
+end
+
+function update(self, dt)
+	-- move forward automatically
+	go.set_position(go.get_position() + self.velocity)
+
+	-- self-destruct.
+	timer.delay(5, false, die)
+end
+
+function on_message(self, message_id, message, sender)
+	die()
+end

@@ -1,0 +1,20 @@
+local function update_life(self, life)
+	local life_gui = gui.get_node("life")
+	gui.set_text(life_gui, tostring(life-1))
+end
+
+local function update_score(self, score)
+	local score_gui = gui.get_node("score")
+	local current_score = gui.get_text(score_gui)
+	gui.set_text(score_gui, tostring(current_score+score))
+end
+
+function on_message(self, message_id, message, sender)
+	-- Add message-handling code here
+	-- Remove this function if not needed
+	if message_id == hash("player_born") then
+		update_life(self, message.life)
+	elseif message_id == hash("enemy_die") then
+		update_score(self, message.score)
+	end
+end

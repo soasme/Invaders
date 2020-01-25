@@ -1,0 +1,37 @@
+local function die(self)
+	print(go.get_id(), "(enemy) die")
+	msg.post("/enemymgr", "enemy_die", { id=go.get_id() })
+	msg.post("/gui", "enemy_die", { score=10 })
+	go.delete()
+end
+
+function shoot(self)
+	local pos = go.get_position() + vmath.vector3(-10, -50, 0)
+	local v = vmath.vector3(0, -3, 0) -- set bullet velocity
+	factory.create("#fire", pos, nil, { velocity=v })
+end
+
+function attack(self)
+	print(go.get_id(), "is attacking...")
+	shoot()
+	timer.delay(math.random(3, 6), false, attack)
+end
+
+function move(self)
+	go.animate(".", "position.x", go.PLAYBACK_LOOP_PINGPONG, go.get_position().x + 80*2, go.EASING_LINEAR, 10)
+	go.animate(".", "position.y", go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 1000)
+end
+
+function init(self)
+	move()
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("collision_response") then
+		die(self)
+	elseif message_id == hash("attack") then
+		attack()
+	elseif message_id == hash("shoot") then
+		shoot()
+	end
+end

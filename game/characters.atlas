@@ -1,0 +1,55 @@
+images {
+  image: "/assets/images/bullet.png"
+}
+animations {
+  id: "enemy1"
+  images {
+    image: "/assets/images/enemy1_1.png"
+  }
+  images {
+    image: "/assets/images/enemy1_2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 2
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "enemy2"
+  images {
+    image: "/assets/images/enemy2_1.png"
+  }
+  images {
+    image: "/assets/images/enemy2_2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 2
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "enemy3"
+  images {
+    image: "/assets/images/enemy3_1.png"
+  }
+  images {
+    image: "/assets/images/enemy3_2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 2
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "player"
+  images {
+    image: "/assets/images/player.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 1
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+margin: 0
+extrude_borders: 2
+inner_padding: 0

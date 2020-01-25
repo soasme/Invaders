@@ -1,0 +1,69 @@
+go.property("col_num", 12)
+go.property("row_num", 3)
+
+function spawn(self)
+	for i = 1,self.col_num,1 do
+		for j = 1,self.row_num,1 do
+			local enemy_pos = vmath.vector3(50+80*i, 720-80*j, 0)
+			local factory_name = "#enemyfactory"
+			if j == 2 then factory_name = "#enemy2factory" end
+			if j == 3 then factory_name = "#enemy3factory" end
+			local enemy = factory.create(factory_name, enemy_pos)
+			table.insert(self.enemies, enemy)
+		end
+	end
+end
+
+function schedule_attack(self)
+	-- choose an enemy that is cloest to the player
+	local player_pos = go.get_position("/player")
+	print("player pos", player_pos)
+	local enemy = nil
+	local min =  1000
+	local min_i = 1
+	for i = self.col_num*self.row_num,1,-1 do
+		enemy = self.enemies[i]
+		if enemy then
+			local distance = math.abs(go.get_position(enemy).x - player_pos.x)
+			if distance < min then
+				min_i = i
+				min = distance
+			end
+		end
+	end
+	msg.post(self.enemies[min_i], "shoot")
+end
+
+function delete_enemy(self, id)
+	-- remove enemy reference in mgr.
+	for i = 1,self.col_num*self.row_num,1 do
+		if self.enemies[i] == id then
+			table.remove(self.enemies, i)
+			return
+		end
+	end
+end
+
+local function start_scheduler(self)
+	self.scheduler = timer.delay(1, true, function() schedule_attack(self) end)
+end
+
+local function cancel_scheduler(self)
+	timer.cancel(self.scheduler)
+end
+
+function init(self)
+	self.enemies = {}
+	math.randomseed(os.time())
+	spawn(self)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("enemy_die") then
+		delete_enemy(self, message.id)
+	elseif message_id == hash("player_born") then
+		start_scheduler(self)
+	elseif message_id == hash("player_die") then
+		cancel_scheduler(self)
+	end
+end

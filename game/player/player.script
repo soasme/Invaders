@@ -1,0 +1,69 @@
+go.property("speed", 5)
+
+go.property("life", 3)
+
+local function born(self)
+	if self.life > 0 then
+		msg.post("#sprite", "enable")
+		msg.post("#co", "enable")
+		msg.post("/enemymgr", "player_born")
+		msg.post("/gui", "player_born", { life=self.life })
+	end
+end
+
+local function die(self)
+	print(go.get_id(), "(player) die")
+	msg.post("/enemymgr", "player_die")
+	msg.post("#sprite", "disable")
+	msg.post("#co", "disable")
+	self.life = self.life - 1
+	timer.delay(2, false, function() born(self) end)
+end
+
+local function move_left(self)
+	go.set_position(go.get_position() - vmath.vector3(self.speed, 0, 0))
+end
+
+local function move_right(self)
+	go.set_position(go.get_position() + vmath.vector3(self.speed, 0, 0))
+end
+
+local function fire(self)
+	local pos = go.get_position() + vmath.vector3(0, 50, 0)
+	local v = vmath.vector3(0, 6, 0) -- set bullet velocity
+	factory.create("#fire", pos, nil, { velocity=v })
+end
+
+local function attack(self)
+	if self.can_fire then
+		self.can_fire = false
+		fire(self)
+		timer.delay(0.5, false, function()
+			self.can_fire = true
+		end)
+	end
+end
+
+function init(self)
+	-- Add initialization code here
+	-- Remove this function if not needed
+	msg.post(".", "acquire_input_focus")
+	self.can_fire = true
+	born(self)
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("left") then
+		move_left(self)
+	elseif action_id == hash("right") then
+		move_right(self)
+	elseif action_id == hash("action") and action.pressed then
+		attack(self)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("trigger_response") then
+		die(self)
+	end
+end

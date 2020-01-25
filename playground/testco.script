@@ -1,0 +1,7 @@
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("contact_point_response") then
+		print("testco", message, message_id, sender)
+	end
+end
